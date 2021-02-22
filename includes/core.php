@@ -16,6 +16,7 @@ namespace Growella\GravityForms\AutocompleteFields\Core;
  */
 function get_autocomplete_values() {
 	$values = array(
+		'none'                 => _x( 'None, do not autocomplete', 'autocomplete attribute label', 'gravityforms-autocomplete-fields' ),
 		'name'                 => _x( 'Full name', 'autocomplete attribute label', 'gravityforms-autocomplete-fields' ),
 		'given-name'           => _x( 'First/given name', 'autocomplete attribute label', 'gravityforms-autocomplete-fields' ),
 		'family-name'          => _x( 'Last/family name', 'autocomplete attribute label', 'gravityforms-autocomplete-fields' ),
@@ -160,10 +161,15 @@ function inject_autocomplete_attribute( $markup, $field ) {
 	 * @param GF_Field $field     The Gravity Forms field object.
 	 */
 	$attribute = apply_filters( 'gform_autocomplete_attribute', $field->autocompleteAttr, $field );
+	
+	if ($attribute != "none") {
+		$autocomplete = sprintf( ' autocomplete="%s"', esc_attr( $attribute ) );
+		$element      = str_replace( $input[1], $autocomplete . $input[1], $input[0] );
+		return str_replace( $input[0], $element, $markup );
+	} else {
+		return $markup;
+	}
 
-	$autocomplete = sprintf( ' autocomplete="%s"', esc_attr( $attribute ) );
-	$element      = str_replace( $input[1], $autocomplete . $input[1], $input[0] );
-
-	return str_replace( $input[0], $element, $markup );
+	
 }
 add_filter( 'gform_field_content', __NAMESPACE__ . '\inject_autocomplete_attribute', 10, 2 );
